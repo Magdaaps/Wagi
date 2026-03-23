@@ -1,0 +1,16 @@
+{
+  "name": "wagi-backend",
+  "version": "1.0.0",
+  "description": "Chocolate factory weighing app backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.3",
+    "multer": "^2.1.1",
+    "xlsx": "^0.18.5"
+  }
+}
