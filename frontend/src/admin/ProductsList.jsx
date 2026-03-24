@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../api';
 
-const BASE_URL = '/api';
+const BASE_URL = (import.meta.env.VITE_API_URL || '') + '/api';
 
 async function uploadProductImage(productId, file) {
   const formData = new FormData();
@@ -161,7 +161,6 @@ export default function ProductsList() {
             <tr style={{ borderBottom: '2px solid #eee', textAlign: 'left' }}>
               <th style={{ padding: '0.5rem', width: '40px' }}>Lp</th>
               <th style={{ padding: '0.5rem', width: '80px' }}>Zdjęcie</th>
-              <th style={{ padding: '0.5rem', width: '130px' }}>EAN</th>
               <th style={{ padding: '0.5rem', width: '30%' }}>Nazwa</th>
               <th style={{ padding: '0.5rem', width: '65px' }}>Waga</th>
               <th style={{ padding: '0.5rem' }}>Składowe</th>
@@ -183,8 +182,7 @@ export default function ProductsList() {
                     }}>Brak</div>
                   )}
                 </td>
-                <td style={{ padding: '0.75rem 0.5rem', fontFamily: 'monospace', fontSize: '0.85rem', wordBreak: 'break-all' }}>{p.ean || '—'}</td>
-                <td style={{ padding: '0.75rem 0.5rem', wordWrap: 'break-word', overflowWrap: 'break-word' }}>{p.name}</td>
+                <td style={{ padding: '0.75rem 0.5rem', paddingLeft: '1.5rem', wordWrap: 'break-word', overflowWrap: 'break-word' }}>{p.name}</td>
                 <td style={{ padding: '0.75rem 0.5rem', textAlign: 'center', fontWeight: 500 }}>{p.declared_weight_g ? `${p.declared_weight_g} g` : '—'}</td>
                 <td style={{ padding: '0.75rem 0.5rem' }}>
                   {p.recipe_items && p.recipe_items.length > 0 ? (
@@ -291,11 +289,6 @@ export default function ProductsList() {
             </div>
 
             <div className="form-group" style={{ marginTop: '1rem' }}>
-              <label className="form-label">EAN</label>
-              <input type="text" className="form-control" value={editEan} onChange={e => setEditEan(e.target.value)} />
-            </div>
-
-            <div className="form-group" style={{ marginTop: '1rem' }}>
               <label className="form-label">Deklarowana waga (g)</label>
               <input type="number" className="form-control" value={editDeclaredWeight} onChange={e => setEditDeclaredWeight(e.target.value)} />
             </div>
@@ -396,17 +389,6 @@ export default function ProductsList() {
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
-            </div>
-
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label className="form-label">EAN</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={newProduct.ean} 
-                onChange={e => setNewProduct({...newProduct, ean: e.target.value})} 
-                placeholder="Kod EAN"
-              />
             </div>
 
             <div className="form-group" style={{ marginBottom: '1.5rem' }}>

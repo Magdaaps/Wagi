@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api';
 
-export default function Measurements({ sessionData, onSessionCreated, onFinish }) {
+export default function Measurements({ sessionData, onSessionCreated, onFinish, onCancel }) {
   const [sessionId, setSessionId] = useState(sessionData.sessionId);
   const [measurements, setMeasurements] = useState([]);
   const [loading, setLoading] = useState(!sessionData.sessionId);
-  
+
   const [emptyKg, setEmptyKg] = useState('');
   const [fullKg, setFullKg] = useState('');
   const [pcs, setPcs] = useState('');
@@ -14,7 +14,6 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish }
 
   useEffect(() => {
     if (!sessionId) {
-      // Start session
       api.createSession({
         operator_id: sessionData.operator.id,
         category_id: sessionData.category.id,
@@ -23,9 +22,9 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish }
       }).then(res => {
         setSessionId(res.id);
         onSessionCreated(res.id);
-        return api.updateSession(res.id, { 
+        return api.updateSession(res.id, {
           date_weighing: new Date().toISOString().split('T')[0],
-          start_time: new Date().toTimeString().substring(0,5),
+          start_time: new Date().toTimeString().substring(0, 5),
           status: 'in_progress'
         });
       }).then(() => setLoading(false));
@@ -68,9 +67,17 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish }
       if (!window.confirm('Brak pomiarów. Na pewno zakończyć?')) return;
     }
     api.updateSession(sessionId, {
-      end_time: new Date().toTimeString().substring(0,5),
+      end_time: new Date().toTimeString().substring(0, 5),
       status: 'completed'
     }).then(() => onFinish());
+  };
+
+  const handleCancel = () => {
+    if (sessionId) {
+      api.deleteSession(sessionId).then(() => onCancel());
+      return;
+    }
+    onCancel();
   };
 
   if (loading) return <div className="text-center mt-4">Uruchamianie sesji...</div>;
@@ -78,17 +85,25 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish }
   return (
     <div style={{ display: 'flex', gap: '2rem' }}>
       <div style={{ flex: 1 }}>
-        <div className="tablet-header" style={{ marginBottom: '1rem' }}>
+        <div className="tablet-header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 className="tablet-step-title">5. Pomiary ({measurements.length})</h1>
-          <button className="btn btn-danger" onClick={endSession}>Zakończ ważenie</button>
         </div>
 
-        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--choc-white)', borderRadius: '8px', borderLeft: '5px solid var(--choc-med)' }}>
-          <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--choc-dark)' }}>
-            {sessionData.product?.name}
-          </div>
-          <div style={{ fontSize: '1.2rem', color: 'var(--choc-med)', marginTop: '0.25rem' }}>
-            Waga wzorcowa: <strong>{sessionData.product?.declared_weight_g}g</strong> (±{sessionData.product?.tolerance_g}g)
+        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--choc-white)', borderRadius: '8px', borderLeft: '5px solid var(--choc-med)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {sessionData.product?.imageUrl && (
+            <img
+              src={sessionData.product.imageUrl}
+              alt={sessionData.product?.name || 'Zdjęcie produktu'}
+              style={{ width: '90px', height: '90px', objectFit: 'contain', borderRadius: '8px' }}
+            />
+          )}
+          <div>
+            <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--choc-dark)' }}>
+              {sessionData.product?.name}
+            </div>
+            <div style={{ fontSize: '1.2rem', color: 'var(--choc-med)', marginTop: '0.25rem' }}>
+              Waga wzorcowa: <strong>{sessionData.product?.declared_weight_g}g</strong> (±{sessionData.product?.tolerance_g}g)
+            </div>
           </div>
         </div>
 
@@ -145,6 +160,10 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish }
               Usuń ostatni wpis
             </button>
           )}
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', justifyContent: 'space-between' }}>
+          <button className="btn btn-outline" onClick={handleCancel}>Anuluj</button>
+          <button className="btn btn-danger" onClick={endSession}>Zakończ ważenie</button>
         </div>
       </div>
     </div>

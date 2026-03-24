@@ -3,6 +3,7 @@ import { api } from '../api';
 
 export default function OperatorsList() {
   const [operators, setOperators] = useState([]);
+  const [search, setSearch] = useState('');
   const [newOperatorName, setNewOperatorName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
 
@@ -38,6 +39,10 @@ export default function OperatorsList() {
     }
   };
 
+  const filteredOperators = operators.filter(op =>
+    !search.trim() || op.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div>
       <div className="admin-header">
@@ -48,6 +53,18 @@ export default function OperatorsList() {
       </div>
 
       <div className="admin-card" style={{ padding: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Szukaj pracownika..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ maxWidth: 400 }}
+          />
+          <span style={{ color: '#888', fontSize: '0.9rem' }}>({filteredOperators.length} z {operators.length})</span>
+        </div>
+
         <table className="table" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #eee', textAlign: 'left' }}>
@@ -57,14 +74,14 @@ export default function OperatorsList() {
             </tr>
           </thead>
           <tbody>
-            {operators.length === 0 ? (
+            {filteredOperators.length === 0 ? (
               <tr>
                 <td colSpan="3" style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
                   Brak pracowników w bazie.
                 </td>
               </tr>
             ) : (
-              operators.map(op => (
+              filteredOperators.map(op => (
                 <tr key={op.id} style={{ borderBottom: '1px solid #eee' }}>
                   <td style={{ padding: '0.75rem' }}>{op.id}</td>
                   <td style={{ padding: '0.75rem' }}>{op.name}</td>

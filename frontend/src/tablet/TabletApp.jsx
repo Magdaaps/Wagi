@@ -35,6 +35,7 @@ export default function TabletApp() {
         <Measurements 
           sessionData={sessionData} 
           onSessionCreated={(id) => updateData({ sessionId: id })}
+          onCancel={resetSession}
           onFinish={nextStep} 
         />
       )}

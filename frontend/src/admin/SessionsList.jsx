@@ -26,7 +26,9 @@ export default function SessionsList() {
     api.getOperators().then(setOperators);
   }, []);
 
-  useEffect(() => { loadData(); }, [filters]);
+  useEffect(() => {
+    loadData();
+  }, [filters]);
 
   const selSession = sessions.find(s => s.id === selectedSessionId) || null;
 
@@ -41,7 +43,13 @@ export default function SessionsList() {
   return (
     <div>
       <h1 style={{ marginBottom: '2rem' }}>Sesje ważeń</h1>
-      <Filters filters={filters} onChange={setFilters} categories={categories} products={products} operators={operators} />
+      <Filters
+        filters={filters}
+        onChange={setFilters}
+        categories={categories}
+        products={products}
+        operators={operators}
+      />
 
       {loading ? <div className="text-center mt-4">Ładowanie sesji...</div> : (
         <table className="data-table" style={{ fontSize: '0.9rem' }}>
@@ -70,7 +78,7 @@ export default function SessionsList() {
                 <td>{s.date_weighing} {s.end_time}</td>
                 <td>{s.duration}</td>
                 <td>{s.operator_name}</td>
-                <td><strong>{s.category_name}</strong><br/>{s.product_name}</td>
+                <td><strong>{s.category_name}</strong><br />{s.product_name}</td>
                 <td>{s.measurement_count} pomiarów</td>
                 <td style={{ fontWeight: 'bold' }}>{s.avg_weight_g}</td>
                 <td>{s.declared_weight_g}</td>
@@ -78,14 +86,14 @@ export default function SessionsList() {
                 <td>{s.diff_pct > 0 ? '+' : ''}{s.diff_pct}%</td>
                 <td>{s.total_chocolate_kg} kg</td>
                 <td onClick={(e) => e.stopPropagation()}>
-                  <button 
-                    className="btn-delete" 
+                  <button
+                    className="btn-delete"
                     onClick={(e) => handleDelete(e, s.id)}
-                    style={{ 
-                      background: '#ff4d4d', 
-                      color: 'white', 
-                      border: 'none', 
-                      padding: '4px 8px', 
+                    style={{
+                      background: '#ff4d4d',
+                      color: 'white',
+                      border: 'none',
+                      padding: '4px 8px',
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '0.8rem'
