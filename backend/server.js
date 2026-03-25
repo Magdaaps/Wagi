@@ -88,6 +88,7 @@ function sessionStats(session) {
     operator_name:    operator.name || '',
     category_name:    category.name || '',
     product_name:     product.name  || '',
+    product_image_url: product.imageUrl || null,
     declared_weight_g: declG,
     tolerance_g:      tolG,
     measurement_count: measurements.length,

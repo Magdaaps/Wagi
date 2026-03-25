@@ -59,6 +59,7 @@ export default function SessionsList() {
               <th>Data (Koniec)</th>
               <th>Czas</th>
               <th>Operator</th>
+              <th>Zdjęcie</th>
               <th>Kategoria / Produkt</th>
               <th>Ilość</th>
               <th>Śr. waga (g)</th>
@@ -71,13 +72,22 @@ export default function SessionsList() {
           </thead>
           <tbody>
             {sessions.length === 0 ? (
-              <tr><td colSpan="12" className="text-center">Brak wyników</td></tr>
+              <tr><td colSpan="13" className="text-center">Brak wyników</td></tr>
             ) : sessions.map(s => (
               <tr key={s.id} onClick={() => setSelectedSessionId(s.id)} style={{ cursor: 'pointer' }}>
                 <td>#{s.id}</td>
                 <td>{s.date_weighing} {s.end_time}</td>
                 <td>{s.duration}</td>
                 <td>{s.operator_name}</td>
+                <td>
+                  {s.product_image_url ? (
+                    <img
+                      src={s.product_image_url}
+                      alt="zdjęcie"
+                      style={{ width: 60, height: 60, objectFit: 'contain', background: 'white', borderRadius: 4 }}
+                    />
+                  ) : 'Brak'}
+                </td>
                 <td><strong>{s.category_name}</strong><br />{s.product_name}</td>
                 <td>{s.measurement_count} pomiarów</td>
                 <td style={{ fontWeight: 'bold' }}>{s.avg_weight_g}</td>
