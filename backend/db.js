@@ -65,6 +65,7 @@ const INITIAL = {
   sessions: [],
   measurements: [],
   _seq: { sessions: 0, measurements: 0 },
+  _admin: { username: 'admin', password: 'admin123' },
 };
 
 // ─── LOAD / SAVE ─────────────────────────────────────────────────────────────

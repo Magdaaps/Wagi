@@ -511,14 +511,27 @@ app.get('/api/export/sessions', (req, res) => {
   res.send(buf);
 });
 
-// ─── ADMIN AUTH (simple) ──────────────────────────────────────────────────────
+// ─── ADMIN AUTH ───────────────────────────────────────────────────────────────
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
-  if (username === 'admin' && password === 'admin123') {
-    res.json({ ok: true, role: 'admin' });
+  const admin = db.data._admin || { username: 'admin', password: 'admin123' };
+  if (username === admin.username && password === admin.password) {
+    res.json({ ok: true, role: 'admin', username: admin.username });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
   }
+});
+
+app.put('/api/auth/settings', (req, res) => {
+  const { currentPassword, newUsername, newPassword } = req.body;
+  const admin = db.data._admin || { username: 'admin', password: 'admin123' };
+  if (currentPassword !== admin.password) {
+    return res.status(401).json({ error: 'Nieprawidłowe aktualne hasło' });
+  }
+  if (newUsername) db.data._admin.username = newUsername;
+  if (newPassword) db.data._admin.password = newPassword;
+  db.save();
+  res.json({ ok: true });
 });
 
 app.listen(PORT, () => console.log(`🍫 Wagi backend running on http://localhost:${PORT}`));

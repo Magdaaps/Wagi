@@ -53,6 +53,8 @@ export const api = {
 
   // Auth
   login: (username, password) => req('/auth/login', { method: 'POST', body: { username, password } }),
+  updateSettings: (currentPassword, newUsername, newPassword) =>
+    req('/auth/settings', { method: 'PUT', body: { currentPassword, newUsername, newPassword } }),
 
   // Export
   exportUrl: (params = {}) => {
