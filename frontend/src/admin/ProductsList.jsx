@@ -22,12 +22,14 @@ export default function ProductsList() {
   const [search, setSearch] = useState('');
   
   // Modal state
+  const [editName, setEditName] = useState('');
   const [editEan, setEditEan] = useState('');
   const [editCategoryId, setEditCategoryId] = useState('');
   const [editDeclaredWeight, setEditDeclaredWeight] = useState('');
   const [editIngredients, setEditIngredients] = useState([]);
   const [newIngredientInput, setNewIngredientInput] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [editingNameInline, setEditingNameInline] = useState(false);
   
   // Add product state
   const [isAddingProduct, setIsAddingProduct] = useState(false);
@@ -51,6 +53,8 @@ export default function ProductsList() {
   const handleEditClick = (product) => {
     api.getProduct(product.id).then(fullProduct => {
       setEditingProduct(fullProduct);
+      setEditName(fullProduct.name || '');
+      setEditingNameInline(false);
       setEditEan(fullProduct.ean || '');
       setEditCategoryId(fullProduct.category_id || '');
       setEditDeclaredWeight(fullProduct.declared_weight_g || '');
@@ -59,6 +63,7 @@ export default function ProductsList() {
   };
 
   const cancelEdit = () => {
+    setEditingNameInline(false);
     setEditingProduct(null);
   };
 
@@ -66,11 +71,13 @@ export default function ProductsList() {
     if (!editingProduct) return;
     
     api.updateProduct(editingProduct.id, {
+      name: editName,
       ean: editEan,
       category_id: editCategoryId ? +editCategoryId : null,
       declared_weight_g: editDeclaredWeight ? +editDeclaredWeight : null,
       recipe_items: editIngredients.map(label => ({ label }))
     }).then(() => {
+      setEditingNameInline(false);
       setEditingProduct(null);
       loadData();
     });
@@ -237,7 +244,39 @@ export default function ProductsList() {
             boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
           }}>
             <h3 style={{ marginBottom: '1.5rem', color: 'var(--choc-dark, #3a2a18)' }}>
-              Edycja: {editingProduct.name}
+              Edycja:{' '}
+              {editingNameInline ? (
+                <input
+                  type="text"
+                  className="form-control"
+                  value={editName}
+                  autoFocus
+                  onChange={e => setEditName(e.target.value)}
+                  onBlur={() => setEditingNameInline(false)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      setEditingNameInline(false);
+                    }
+                  }}
+                  style={{ display: 'inline-block', width: 'auto', minWidth: '240px' }}
+                />
+              ) : (
+                <>
+                  <span
+                    onClick={() => setEditingNameInline(true)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {editName}
+                  </span>
+                  <span
+                    onClick={() => setEditingNameInline(true)}
+                    style={{ cursor: 'pointer', fontSize: '0.9rem', marginLeft: '0.4rem' }}
+                    title="Edytuj nazwę"
+                  >
+                    ✏️
+                  </span>
+                </>
+              )}
             </h3>
 
             {/* Image section */}

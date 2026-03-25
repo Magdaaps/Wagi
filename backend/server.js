@@ -191,8 +191,9 @@ app.put('/api/products/:id', (req, res) => {
   const product = db.data.products.find(p => p.id === id);
   if (!product) return res.status(404).json({ error: 'Not found' });
 
-  const { ean, imageUrl, recipe_items, category_id, declared_weight_g } = req.body;
-  
+  const { name, ean, imageUrl, recipe_items, category_id, declared_weight_g } = req.body;
+  if (name !== undefined && name.trim()) product.name = name.trim();
+
   if (ean !== undefined) product.ean = ean;
   if (imageUrl !== undefined) product.imageUrl = imageUrl;
   if (category_id !== undefined) product.category_id = category_id ? +category_id : null;

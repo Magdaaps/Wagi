@@ -52,11 +52,12 @@ export default function SessionsList() {
       />
 
       {loading ? <div className="text-center mt-4">Ładowanie sesji...</div> : (
-        <table className="data-table" style={{ fontSize: '0.9rem' }}>
-          <thead>
+        <div style={{ overflowY: 'auto', maxHeight: '784px' }}>
+          <table className="data-table" style={{ fontSize: '0.9rem' }}>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 1, background: '#2c1a0e' }}>
             <tr>
               <th>ID</th>
-              <th>Data (Koniec)</th>
+              <th>Data</th>
               <th>Czas</th>
               <th>Operator</th>
               <th>Zdjęcie</th>
@@ -76,7 +77,7 @@ export default function SessionsList() {
             ) : sessions.map(s => (
               <tr key={s.id} onClick={() => setSelectedSessionId(s.id)} style={{ cursor: 'pointer' }}>
                 <td>#{s.id}</td>
-                <td>{s.date_weighing} {s.end_time}</td>
+                <td>{s.date_weighing}</td>
                 <td>{s.duration}</td>
                 <td>{s.operator_name}</td>
                 <td>
@@ -115,7 +116,8 @@ export default function SessionsList() {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       )}
 
       {selectedSessionId && selSession && (
