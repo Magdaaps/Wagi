@@ -10,7 +10,7 @@ import SessionReview from './SessionReview';
 export default function TabletApp() {
   const [step, setStep] = useState(1);
   const [sessionData, setSessionData] = useState({
-    operator: null,
+    operators: [],
     category: null,
     product: null,
     batchNumbers: {},
@@ -19,7 +19,7 @@ export default function TabletApp() {
 
   const nextStep = () => setStep(s => s + 1);
   const resetSession = () => {
-    setSessionData({ operator: null, category: null, product: null, batchNumbers: {}, sessionId: null });
+    setSessionData({ operators: [], category: null, product: null, batchNumbers: {}, sessionId: null });
     setStep(1);
   };
 
@@ -27,7 +27,7 @@ export default function TabletApp() {
 
   return (
     <div className="tablet-container">
-      {step === 1 && <OperatorSelect onSelect={(op) => { updateData({ operator: op }); nextStep(); }} />}
+      {step === 1 && <OperatorSelect onSelect={(ops) => { updateData({ operators: ops }); nextStep(); }} />}
       {step === 2 && <CategorySelect onSelect={(cat) => { updateData({ category: cat }); nextStep(); }} onBack={() => setStep(1)} />}
       {step === 3 && <ProductSelect categoryId={sessionData.category?.id} onSelect={(prod) => { updateData({ product: prod }); nextStep(); }} onBack={() => setStep(2)} />}
       {step === 4 && <BatchNumbers product={sessionData.product} onSubmit={(batches) => { updateData({ batchNumbers: batches }); nextStep(); }} onBack={() => setStep(3)} />}

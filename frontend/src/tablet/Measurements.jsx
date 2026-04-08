@@ -15,7 +15,7 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish, 
   useEffect(() => {
     if (!sessionId) {
       api.createSession({
-        operator_id: sessionData.operator.id,
+        operator_ids: sessionData.operators.map(o => o.id),
         category_id: sessionData.category.id,
         product_id: sessionData.product.id,
         batch_numbers: sessionData.batchNumbers
