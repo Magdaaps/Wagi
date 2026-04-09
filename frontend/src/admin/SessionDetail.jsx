@@ -54,17 +54,22 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
                 <tr><td>Śr. waga 1 szt:</td><th>{session.avg_weight_g} g</th></tr>
                 <tr><td>Różnica:</td><th>{session.diff_g > 0 ? '+' : ''}{session.diff_g} g ({session.diff_pct > 0 ? '+' : ''}{session.diff_pct}%)</th></tr>
                 <tr><td>Suma różnic:</td><th>{session.sum_diff_kg > 0 ? '+' : ''}{session.sum_diff_kg} kg</th></tr>
-                <tr><td>Planowane zużycie surowca:</td><th>{session.planned_consumption_kg ?? (session.total_chocolate_kg - session.sum_diff_kg).toFixed(2)} kg</th></tr>
-                <tr><td>Całkowite zużycie:</td><th>{session.total_chocolate_kg} kg</th></tr>
                 {(() => {
                   const hasPatyczki = Object.keys(session.batch_numbers || {}).some(key => {
                     const r = session.recipe_items?.find(x => x.ingredient_type === key);
                     const label = r ? r.label : key;
-                    return label.toLowerCase().includes('patyczki papierowe');
+                    return ['patyczki papierowe', 'patyczki plastikowe', 'patyczki drewniane'].some(t => label.toLowerCase().includes(t));
                   });
-                  if (!hasPatyczki) return null;
-                  const patyczkiKg = ((session.total_piece_count || 0) * 0.001).toFixed(3);
-                  return <tr><td>Waga patyczków:</td><th>{patyczkiKg} kg</th></tr>;
+                  const patyczkiKg = hasPatyczki ? (session.total_piece_count || 0) * 0.001 : 0;
+                  const patyczkiKgStr = patyczkiKg.toFixed(3);
+                  const plannedRaw = session.planned_consumption_kg ?? (session.total_chocolate_kg - session.sum_diff_kg);
+                  const plannedNet = (parseFloat(plannedRaw) - patyczkiKg).toFixed(2);
+                  const totalNet = (parseFloat(session.total_chocolate_kg) - patyczkiKg).toFixed(2);
+                  return <>
+                    <tr><td>Planowane zużycie surowca:</td><th>{plannedNet} kg</th></tr>
+                    <tr><td>Całkowite zużycie:</td><th>{totalNet} kg</th></tr>
+                    {hasPatyczki && <tr><td>Waga patyczków:</td><th>{patyczkiKgStr} kg</th></tr>}
+                  </>;
                 })()}
               </tbody>
             </table>
