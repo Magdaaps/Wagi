@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 
+// Returns replacement options for a given chocolate/coating label
+function getChocCoatingOptions(label) {
+  const l = label.toLowerCase();
+  if (l.includes('mleczn')) return ['Czekolada mleczna', 'Polewa mleczna'];
+  if (l.includes('biał')) return ['Czekolada biała', 'Polewa biała'];
+  if (l.includes('deserow') || l.includes('gorzk') || l.includes('ciemn')) {
+    return ['Czekolada deserowa', 'Czekolada gorzka', 'Polewa ciemna'];
+  }
+  return [label];
+}
+
 export default function BatchNumbers({ product, onSubmit, onBack }) {
   const [recipe, setRecipe] = useState([]);
   const [batches, setBatches] = useState({});
   const [companies, setCompanies] = useState([]);
+  const [labelOverrides, setLabelOverrides] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!product) return;
-    
+
     // Fetch both product recipe and all ingredients to get companies
     Promise.all([
       api.getProduct(product.id),
       api.getIngredientsAll()
     ]).then(([productData, allIngredients]) => {
       setRecipe(productData.recipe_items || []);
-      
+
       const firms = allIngredients.filter(i => i.category === 'Firmy');
       setCompanies(firms);
 
@@ -43,18 +55,17 @@ export default function BatchNumbers({ product, onSubmit, onBack }) {
     });
   };
 
+  const handleLabelChange = (itemId, newLabel) => {
+    setLabelOverrides(prev => ({ ...prev, [itemId]: newLabel }));
+  };
+
+  const getEffectiveLabel = (item) => labelOverrides[item.id] ?? item.label;
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const formattedBatches = {};
     recipe.forEach(r => {
-      const val = batches[r.id];
-      if (typeof val === 'object') {
-        // Store as structured data or string? 
-        // Let's store as object to be clean, but we'll need to update displays.
-        formattedBatches[r.label] = val;
-      } else {
-        formattedBatches[r.label] = val;
-      }
+      formattedBatches[getEffectiveLabel(r)] = batches[r.id];
     });
     onSubmit(formattedBatches);
   };
@@ -88,10 +99,25 @@ export default function BatchNumbers({ product, onSubmit, onBack }) {
       <form onSubmit={handleSubmit} style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '2rem', borderRadius: '12px' }}>
         {recipe.map((item, idx) => {
           const isChocOrCoating = typeof batches[item.id] === 'object';
+          const effectiveLabel = getEffectiveLabel(item);
+          const options = isChocOrCoating ? getChocCoatingOptions(item.label) : [];
           return (
             <div className="form-group" key={item.id} style={{ marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-              <label className="form-label">{idx + 1}. {item.label}</label>
-              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                <label className="form-label" style={{ margin: 0 }}>{idx + 1}. {effectiveLabel}</label>
+                {isChocOrCoating && options.length > 1 && (
+                  <select
+                    value={effectiveLabel}
+                    onChange={(e) => handleLabelChange(item.id, e.target.value)}
+                    style={{ fontSize: '0.75rem', padding: '2px 6px', border: '1px solid #c8956b', borderRadius: '6px', color: '#c8956b', background: 'white', cursor: 'pointer' }}
+                  >
+                    {options.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
               <div style={{ display: 'flex', gap: '1rem' }}>
                 <div style={{ flex: 2 }}>
                   <label style={{ fontSize: '0.8rem', color: '#666' }}>Numer partii:</label>
