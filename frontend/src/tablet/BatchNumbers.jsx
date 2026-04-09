@@ -22,7 +22,7 @@ export default function BatchNumbers({ product, onSubmit, onBack }) {
 
       const initBatches = {};
       (productData.recipe_items || []).forEach(r => {
-        const isChocOrCoating = r.label.toLowerCase().includes('czekolada') || r.label.toLowerCase().includes('polewa');
+        const isChocOrCoating = (r.label.toLowerCase().includes('czekolada') || r.label.toLowerCase().includes('polewa')) && !r.label.toLowerCase().includes('wypraska');
         if (isChocOrCoating) {
           initBatches[r.id] = { batch: '', company: '' };
         } else {

@@ -101,7 +101,7 @@ export default function AdminApp() {
     <>
       <div className="admin-layout">
         <div className="admin-sidebar">
-          <div className="admin-brand">Wagi Factory</div>
+          <div className="admin-brand">Wagi Adikam</div>
           <NavLink to="/admin" end className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}>Sesje ważeń</NavLink>
           <NavLink to="/admin/products" className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}>Produkty</NavLink>
           <NavLink to="/admin/raw-materials" className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}>Surowce</NavLink>
