@@ -12,6 +12,15 @@ function getChocCoatingOptions(label) {
   return [label];
 }
 
+const STICK_OPTIONS = [
+  'Patyczki drewniane',
+  'Patyczki papierowe 120mm',
+  'Patyczki papierowe 80mm',
+  'Patyczki plastikowe 120mm',
+  'Patyczki plastikowe 135mm',
+  'Patyczki plastikowe 80mm',
+];
+
 export default function BatchNumbers({ product, onSubmit, onBack }) {
   const [recipe, setRecipe] = useState([]);
   const [batches, setBatches] = useState({});
@@ -99,6 +108,7 @@ export default function BatchNumbers({ product, onSubmit, onBack }) {
       <form onSubmit={handleSubmit} style={{ maxWidth: '800px', margin: '0 auto', background: 'white', padding: '2rem', borderRadius: '12px' }}>
         {recipe.map((item, idx) => {
           const isChocOrCoating = typeof batches[item.id] === 'object';
+          const isStick = item.label.toLowerCase().includes('patyczki');
           const effectiveLabel = getEffectiveLabel(item);
           const options = isChocOrCoating ? getChocCoatingOptions(item.label) : [];
           return (
@@ -112,6 +122,17 @@ export default function BatchNumbers({ product, onSubmit, onBack }) {
                     style={{ fontSize: '0.75rem', padding: '2px 6px', border: '1px solid #c8956b', borderRadius: '6px', color: '#c8956b', background: 'white', cursor: 'pointer' }}
                   >
                     {options.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                )}
+                {isStick && (
+                  <select
+                    value={effectiveLabel}
+                    onChange={(e) => handleLabelChange(item.id, e.target.value)}
+                    style={{ fontSize: '0.75rem', padding: '2px 6px', border: '1px solid #c8956b', borderRadius: '6px', color: '#c8956b', background: 'white', cursor: 'pointer' }}
+                  >
+                    {STICK_OPTIONS.map(opt => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </select>
