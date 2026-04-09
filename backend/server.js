@@ -772,8 +772,18 @@ app.get('/api/export/sessions', asyncHandler(async (req, res) => {
       aoa.push(['Ilosc sztuk:', `${session.total_piece_count} szt`]);
       aoa.push(['Sr. waga 1 szt (g):', session.avg_weight_g], ['Roznica (g):', session.diff_g], ['Roznica (%):', session.diff_pct]);
       const hasPatyczki = (session.recipe_items || []).some((r) => (r.label || '').toLowerCase().includes('patyczki papierowe'));
-      const patyczkiRow = hasPatyczki ? [['Waga patyczkow (kg):', Number((session.total_piece_count * 0.001).toFixed(3))]] : [];
-      aoa.push(['Suma roznic (kg):', session.sum_diff_kg], ['Planowane zuzycie surowca (kg):', session.planned_consumption_kg], ['Calkowite zuzycie (kg):', session.total_chocolate_kg], ...patyczkiRow, []);
+      const hasWypraska = Object.keys(session.batch_numbers || {}).some((key) => {
+        const r = (session.recipe_items || []).find((x) => x.ingredient_type === key);
+        const label = r ? r.label : key;
+        return label.toLowerCase().includes('wypraska');
+      });
+      const patyczkiKg = hasPatyczki ? Number((session.total_piece_count * 0.001).toFixed(3)) : 0;
+      const wypraskaKg = hasWypraska ? Number((session.total_piece_count * 0.012).toFixed(3)) : 0;
+      const plannedNet = Number((parseFloat(session.planned_consumption_kg) - patyczkiKg - wypraskaKg).toFixed(2));
+      const totalNet = Number((parseFloat(session.total_chocolate_kg) - patyczkiKg - wypraskaKg).toFixed(2));
+      const patyczkiRow = hasPatyczki ? [['Waga patyczkow (kg):', patyczkiKg]] : [];
+      const wypraskaRow = hasWypraska ? [['Waga wyprasek (kg):', wypraskaKg]] : [];
+      aoa.push(['Suma roznic (kg):', session.sum_diff_kg], ['Planowane zuzycie surowca (kg):', plannedNet], ['Calkowite zuzycie (kg):', totalNet], ...patyczkiRow, ...wypraskaRow, []);
       if (Object.keys(bn).length > 0) {
         aoa.push(['NUMERY PARTII SUROWCOW']);
         Object.keys(bn).forEach((key) => {
@@ -811,6 +821,16 @@ app.get('/api/export/sessions', asyncHandler(async (req, res) => {
     });
 
     const exportRows = rows.map((session) => {
+      const hasPatyczkiB = (session.recipe_items || []).some((r) => (r.label || '').toLowerCase().includes('patyczki papierowe'));
+      const hasWypraskaB = Object.keys(session.batch_numbers || {}).some((key) => {
+        const r = (session.recipe_items || []).find((x) => x.ingredient_type === key);
+        const label = r ? r.label : key;
+        return label.toLowerCase().includes('wypraska');
+      });
+      const patyczkiKgB = hasPatyczkiB ? Number(((session.total_piece_count || 0) * 0.001).toFixed(3)) : 0;
+      const wypraskaKgB = hasWypraskaB ? Number(((session.total_piece_count || 0) * 0.012).toFixed(3)) : 0;
+      const plannedNetB = Number((parseFloat(session.planned_consumption_kg) - patyczkiKgB - wypraskaKgB).toFixed(2));
+      const totalNetB = Number((parseFloat(session.total_chocolate_kg) - patyczkiKgB - wypraskaKgB).toFixed(2));
       const row = {
         'Data wazenia': session.date_weighing,
         'Godz. start': session.start_time,
@@ -825,8 +845,8 @@ app.get('/api/export/sessions', asyncHandler(async (req, res) => {
         'Roznica sr (g)': session.diff_g,
         'Roznica sr (%)': session.diff_pct,
         'Suma roznic (kg)': session.sum_diff_kg,
-        'Planowane zuzycie surowca (kg)': session.planned_consumption_kg,
-        'Calkowite zuzycie (kg)': session.total_chocolate_kg,
+        'Planowane zuzycie surowca (kg)': plannedNetB,
+        'Calkowite zuzycie (kg)': totalNetB,
       };
 
       allBatchKeys.forEach((key) => {
