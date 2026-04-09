@@ -60,15 +60,23 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
                     const label = r ? r.label : key;
                     return ['patyczki papierowe', 'patyczki plastikowe', 'patyczki drewniane'].some(t => label.toLowerCase().includes(t));
                   });
+                  const hasWypraska = Object.keys(session.batch_numbers || {}).some(key => {
+                    const r = session.recipe_items?.find(x => x.ingredient_type === key);
+                    const label = r ? r.label : key;
+                    return label.toLowerCase().includes('wypraska');
+                  });
                   const patyczkiKg = hasPatyczki ? (session.total_piece_count || 0) * 0.001 : 0;
+                  const wypraskaKg = hasWypraska ? (session.total_piece_count || 0) * 0.012 : 0;
                   const patyczkiKgStr = patyczkiKg.toFixed(3);
+                  const wypraskaKgStr = wypraskaKg.toFixed(3);
                   const plannedRaw = session.planned_consumption_kg ?? (session.total_chocolate_kg - session.sum_diff_kg);
-                  const plannedNet = (parseFloat(plannedRaw) - patyczkiKg).toFixed(2);
-                  const totalNet = (parseFloat(session.total_chocolate_kg) - patyczkiKg).toFixed(2);
+                  const plannedNet = (parseFloat(plannedRaw) - patyczkiKg - wypraskaKg).toFixed(2);
+                  const totalNet = (parseFloat(session.total_chocolate_kg) - patyczkiKg - wypraskaKg).toFixed(2);
                   return <>
                     <tr><td>Planowane zużycie surowca:</td><th>{plannedNet} kg</th></tr>
                     <tr><td>Całkowite zużycie:</td><th>{totalNet} kg</th></tr>
                     {hasPatyczki && <tr><td>Waga patyczków:</td><th>{patyczkiKgStr} kg</th></tr>}
+                    {hasWypraska && <tr><td>Waga wyprasek:</td><th>{wypraskaKgStr} kg</th></tr>}
                   </>;
                 })()}
               </tbody>
