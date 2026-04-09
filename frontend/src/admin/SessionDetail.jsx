@@ -56,6 +56,16 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
                 <tr><td>Suma różnic:</td><th>{session.sum_diff_kg > 0 ? '+' : ''}{session.sum_diff_kg} kg</th></tr>
                 <tr><td>Planowane zużycie surowca:</td><th>{session.planned_consumption_kg ?? (session.total_chocolate_kg - session.sum_diff_kg).toFixed(2)} kg</th></tr>
                 <tr><td>Całkowite zużycie:</td><th>{session.total_chocolate_kg} kg</th></tr>
+                {(() => {
+                  const hasPatyczki = Object.keys(session.batch_numbers || {}).some(key => {
+                    const r = session.recipe_items?.find(x => x.ingredient_type === key);
+                    const label = r ? r.label : key;
+                    return label.toLowerCase().includes('patyczki papierowe');
+                  });
+                  if (!hasPatyczki) return null;
+                  const patyczkiKg = ((session.total_piece_count || 0) * 0.001).toFixed(3);
+                  return <tr><td>Waga patyczków:</td><th>{patyczkiKg} kg</th></tr>;
+                })()}
               </tbody>
             </table>
           </div>
