@@ -8,6 +8,8 @@ export default function IngredientsList() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newName, setNewName] = useState('');
   const [newCategory, setNewCategory] = useState('Dodatki');
+  const [editingLabel, setEditingLabel] = useState(null);
+  const [editingValue, setEditingValue] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -58,6 +60,29 @@ export default function IngredientsList() {
     }).catch(err => {
       alert('Błąd podczas dodawania surowca: ' + err.message);
     });
+  };
+
+  const handleEditStart = (label) => {
+    setEditingLabel(label);
+    setEditingValue(label);
+  };
+
+  const handleEditSave = (oldLabel) => {
+    if (!editingValue.trim() || editingValue.trim() === oldLabel) {
+      setEditingLabel(null);
+      return;
+    }
+    api.renameIngredient(oldLabel, editingValue.trim()).then(() => {
+      setEditingLabel(null);
+      loadData();
+    }).catch(err => {
+      alert('Błąd podczas zmiany nazwy: ' + err.message);
+    });
+  };
+
+  const handleEditCancel = () => {
+    setEditingLabel(null);
+    setEditingValue('');
   };
 
   const handleDelete = (label) => {
@@ -187,17 +212,47 @@ export default function IngredientsList() {
                 {grouped[selectedCategory].map((ing, idx) => (
                   <tr key={ing.label} style={{ borderBottom: '1px solid #f9f9f9' }}>
                     <td style={{ padding: '1rem', color: '#888' }}>{idx + 1}</td>
-                    <td style={{ padding: '1rem', fontWeight: 500, fontSize: '1.1rem' }}>{ing.label}</td>
+                    <td style={{ padding: '1rem' }}>
+                      {editingLabel === ing.label ? (
+                        <form onSubmit={e => { e.preventDefault(); handleEditSave(ing.label); }} style={{ display: 'flex', gap: '0.5rem' }}>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editingValue}
+                            onChange={e => setEditingValue(e.target.value)}
+                            autoFocus
+                            style={{ flex: 1 }}
+                          />
+                          <button type="submit" className="btn btn-primary" style={{ padding: '0.3rem 0.8rem' }}>Zapisz</button>
+                          <button type="button" className="btn btn-outline" onClick={handleEditCancel} style={{ padding: '0.3rem 0.8rem' }}>Anuluj</button>
+                        </form>
+                      ) : (
+                        <span style={{ fontWeight: 500, fontSize: '1.1rem' }}>{ing.label}</span>
+                      )}
+                    </td>
                     <td style={{ padding: '1rem', textAlign: 'center' }}>
-                      <button 
-                        onClick={() => handleDelete(ing.label)}
-                        title="Usuń surowiec"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5, color: '#d9534f' }}
-                        onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                        onMouseLeave={e => e.currentTarget.style.opacity = 0.5}
-                      >
-                        🗑️
-                      </button>
+                      {editingLabel !== ing.label && (
+                        <>
+                          <button
+                            onClick={() => handleEditStart(ing.label)}
+                            title="Edytuj nazwę"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', opacity: 0.5, color: '#5a7a5a', marginRight: '0.5rem' }}
+                            onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                            onMouseLeave={e => e.currentTarget.style.opacity = 0.5}
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleDelete(ing.label)}
+                            title="Usuń surowiec"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', opacity: 0.5, color: '#d9534f' }}
+                            onMouseEnter={e => e.currentTarget.style.opacity = 1}
+                            onMouseLeave={e => e.currentTarget.style.opacity = 0.5}
+                          >
+                            🗑️
+                          </button>
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}

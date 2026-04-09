@@ -33,6 +33,7 @@ export const api = {
   getIngredients: () => req('/ingredients'),
   getIngredientsAll: () => req('/ingredients/all'),
   addIngredient: (label, category) => req('/ingredients', { method: 'POST', body: { label, category } }),
+  renameIngredient: (label, newLabel) => req(`/ingredients/${encodeURIComponent(label)}`, { method: 'PATCH', body: { newLabel } }),
   deleteIngredient: (label) => req(`/ingredients/${encodeURIComponent(label)}`, { method: 'DELETE' }),
 
   // Sessions

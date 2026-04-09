@@ -569,6 +569,15 @@ app.post('/api/ingredients', asyncHandler(async (req, res) => {
   res.status(201).json({ ok: true, label });
 }));
 
+app.patch('/api/ingredients/:label', asyncHandler(async (req, res) => {
+  const oldLabel = req.params.label;
+  const { newLabel } = req.body;
+  if (!newLabel || !newLabel.trim()) return res.status(400).json({ error: 'newLabel is required' });
+  const { error } = await supabase.from('ingredients').update({ label: newLabel.trim() }).eq('label', oldLabel);
+  if (error) throw dbError('Unable to rename ingredient', error);
+  res.json({ ok: true });
+}));
+
 app.delete('/api/ingredients/:label', asyncHandler(async (req, res) => {
   const { error } = await supabase.from('ingredients').delete().eq('label', req.params.label);
   if (error) throw dbError('Unable to delete ingredient', error);
