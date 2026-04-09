@@ -760,8 +760,11 @@ app.get('/api/export/sessions', asyncHandler(async (req, res) => {
       aoa.push(['Data:', session.date_weighing], ['Start/Koniec:', `${session.start_time || ''} - ${session.end_time || ''}`], ['Czas trwania:', session.duration || ''], []);
       aoa.push(['WYLICZENIA']);
       aoa.push(['Dekl. waga (g):', `${session.declared_weight_g} g (+/-${session.tolerance_g}g)`]);
+      aoa.push(['Ilosc sztuk:', `${session.total_piece_count} szt`]);
       aoa.push(['Sr. waga 1 szt (g):', session.avg_weight_g], ['Roznica (g):', session.diff_g], ['Roznica (%):', session.diff_pct]);
-      aoa.push(['Suma roznic (kg):', session.sum_diff_kg], ['Planowane zuzycie surowca (kg):', session.planned_consumption_kg], ['Calkowite zuzycie (kg):', session.total_chocolate_kg], []);
+      const hasPatyczki = (session.recipe_items || []).some((r) => (r.label || '').toLowerCase().includes('patyczki papierowe'));
+      const patyczkiRow = hasPatyczki ? [['Waga patyczkow (kg):', Number((session.total_piece_count * 0.001).toFixed(3))]] : [];
+      aoa.push(['Suma roznic (kg):', session.sum_diff_kg], ['Planowane zuzycie surowca (kg):', session.planned_consumption_kg], ['Calkowite zuzycie (kg):', session.total_chocolate_kg], ...patyczkiRow, []);
       if (Object.keys(bn).length > 0) {
         aoa.push(['NUMERY PARTII SUROWCOW']);
         Object.keys(bn).forEach((key) => {
