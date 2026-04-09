@@ -299,6 +299,7 @@ async function fetchSessionStatsRows(filters = {}) {
       declared_weight_g: declaredWeight,
       tolerance_g: tolerance,
       measurement_count: sessionMeasurements.length,
+      total_piece_count: totalPieces,
       avg_weight_g: Number(avgWeight.toFixed(2)),
       diff_g: diffG,
       diff_pct: diffPct,

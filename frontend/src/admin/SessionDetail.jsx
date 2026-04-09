@@ -50,6 +50,7 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr><td>Dekl. waga:</td><th>{session.declared_weight_g} g (±{session.tolerance_g}g)</th></tr>
+                <tr><td>Ilość sztuk:</td><th>{session.total_piece_count} szt</th></tr>
                 <tr><td>Śr. waga 1 szt:</td><th>{session.avg_weight_g} g</th></tr>
                 <tr><td>Różnica:</td><th>{session.diff_g > 0 ? '+' : ''}{session.diff_g} g ({session.diff_pct > 0 ? '+' : ''}{session.diff_pct}%)</th></tr>
                 <tr><td>Suma różnic:</td><th>{session.sum_diff_kg > 0 ? '+' : ''}{session.sum_diff_kg} kg</th></tr>
