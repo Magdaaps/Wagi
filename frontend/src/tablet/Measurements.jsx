@@ -6,10 +6,12 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish, 
   const [measurements, setMeasurements] = useState([]);
   const [loading, setLoading] = useState(!sessionData.sessionId);
 
+  const [boxNumber, setBoxNumber] = useState('');
   const [emptyKg, setEmptyKg] = useState('');
   const [fullKg, setFullKg] = useState('');
   const [pcs, setPcs] = useState('');
 
+  const boxRef = useRef();
   const emptyRef = useRef();
 
   useEffect(() => {
@@ -40,15 +42,17 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish, 
     e.preventDefault();
     if (!emptyKg || !fullKg || !pcs) return;
     api.addMeasurement(sessionId, {
+      box_number: boxNumber || null,
       empty_box_weight_kg: parseFloat(emptyKg),
       full_box_weight_kg: parseFloat(fullKg),
       piece_count: parseInt(pcs, 10)
     }).then(newM => {
       setMeasurements([...measurements, newM]);
+      setBoxNumber('');
       setEmptyKg('');
       setFullKg('');
       setPcs('');
-      emptyRef.current?.focus();
+      boxRef.current?.focus();
     });
   };
 
@@ -98,16 +102,20 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish, 
             />
           )}
           <div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: 'var(--choc-dark)' }}>
+            <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--choc-dark)' }}>
               {sessionData.product?.name}
             </div>
-            <div style={{ fontSize: '1.2rem', color: 'var(--choc-med)', marginTop: '0.25rem' }}>
+            <div style={{ fontSize: '1rem', color: 'var(--choc-med)', marginTop: '0.25rem' }}>
               Waga wzorcowa: <strong>{sessionData.product?.declared_weight_g}g</strong> (±{sessionData.product?.tolerance_g}g)
             </div>
           </div>
         </div>
 
         <form onSubmit={handleAdd} style={{ background: 'white', padding: '1.5rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+          <div className="form-group">
+            <label className="form-label">Numer skrzynki</label>
+            <input ref={boxRef} type="text" className="form-control" value={boxNumber} onChange={e => setBoxNumber(e.target.value)} />
+          </div>
           <div className="form-group">
             <label className="form-label">Waga pustej skrzynki (kg)</label>
             <input ref={emptyRef} type="number" step="0.001" className="form-control" value={emptyKg} onChange={e => setEmptyKg(e.target.value)} required />
@@ -134,6 +142,7 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish, 
               <thead>
                 <tr>
                   <th>Nr</th>
+                  <th>Skrzynka</th>
                   <th>Produkt (kg)</th>
                   <th>Szt.</th>
                   <th>1 szt (g)</th>
@@ -144,6 +153,7 @@ export default function Measurements({ sessionData, onSessionCreated, onFinish, 
                 {[...measurements].reverse().slice(0, 10).map((m, i) => (
                   <tr key={m.id}>
                     <td>{measurements.length - i}</td>
+                    <td>{m.box_number || '-'}</td>
                     <td>{m.product_weight_kg.toFixed(3)}</td>
                     <td>{m.piece_count}</td>
                     <td style={{ fontWeight: 'bold', color: parseFloat(m.diff_g) > parseFloat(sessionData.product.tolerance_g) ? 'orange' : parseFloat(m.diff_g) < -parseFloat(sessionData.product.tolerance_g) ? 'red' : 'green' }}>

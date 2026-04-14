@@ -686,6 +686,7 @@ app.post('/api/sessions/:id/measurements', asyncHandler(async (req, res) => {
   const payload = {
     session_id: sessionId,
     seq,
+    box_number: req.body.box_number || null,
     empty_box_weight_kg: Number(req.body.empty_box_weight_kg),
     full_box_weight_kg: Number(req.body.full_box_weight_kg),
     piece_count: Number(req.body.piece_count),

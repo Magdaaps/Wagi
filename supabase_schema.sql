@@ -54,6 +54,7 @@ create table if not exists measurements (
   id bigserial primary key,
   session_id bigint not null references sessions(id) on delete cascade,
   seq integer not null,
+  box_number text,
   empty_box_weight_kg numeric(10, 3) not null,
   full_box_weight_kg numeric(10, 3) not null,
   piece_count integer not null,
