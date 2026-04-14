@@ -711,6 +711,7 @@ app.put('/api/sessions/:id/measurements/:mid', asyncHandler(async (req, res) => 
   const sessionId = Number(req.params.id);
 
   const patch = {};
+  if (req.body.box_number !== undefined) patch.box_number = req.body.box_number || null;
   if (req.body.empty_box_weight_kg !== undefined) patch.empty_box_weight_kg = Number(req.body.empty_box_weight_kg);
   if (req.body.full_box_weight_kg !== undefined) patch.full_box_weight_kg = Number(req.body.full_box_weight_kg);
   if (req.body.piece_count !== undefined) patch.piece_count = Number(req.body.piece_count);

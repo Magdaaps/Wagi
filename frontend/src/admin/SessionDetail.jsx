@@ -7,7 +7,7 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
 
   const startEdit = (m) => {
     setEditingMid(m.id);
-    setEditForm({ empty_box_weight_kg: m.empty_box_weight_kg, full_box_weight_kg: m.full_box_weight_kg, piece_count: m.piece_count });
+    setEditForm({ box_number: m.box_number || '', empty_box_weight_kg: m.empty_box_weight_kg, full_box_weight_kg: m.full_box_weight_kg, piece_count: m.piece_count });
   };
 
   const saveEdit = (mid) => {
@@ -102,6 +102,7 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
           <thead>
             <tr>
               <th>Nr</th>
+              <th>Nr skrzynki</th>
               <th>Pusta skrzynka (kg)</th>
               <th>Pełna skrzynka (kg)</th>
               <th>Sztuk</th>
@@ -119,6 +120,7 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
                 <td>{m.seq}</td>
                 {editingMid === m.id ? (
                   <>
+                    <td><input type="text" style={{ width: '100%' }} value={editForm.box_number || ''} onChange={e => setEditForm({...editForm, box_number: e.target.value})} /></td>
                     <td><input type="number" step="0.001" style={{ width: '100%' }} value={editForm.empty_box_weight_kg} onChange={e => setEditForm({...editForm, empty_box_weight_kg: e.target.value})} /></td>
                     <td><input type="number" step="0.001" style={{ width: '100%' }} value={editForm.full_box_weight_kg} onChange={e => setEditForm({...editForm, full_box_weight_kg: e.target.value})} /></td>
                      <td><input type="number" style={{ width: '100%' }} value={editForm.piece_count} onChange={e => setEditForm({...editForm, piece_count: e.target.value})} /></td>
@@ -130,6 +132,7 @@ export default function SessionDetail({ session, onClose, onUpdate }) {
                   </>
                 ) : (
                   <>
+                    <td>{m.box_number || '-'}</td>
                     <td>{m.empty_box_weight_kg}</td>
                     <td>{m.full_box_weight_kg}</td>
                     <td>{m.piece_count}</td>
