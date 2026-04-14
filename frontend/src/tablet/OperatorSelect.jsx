@@ -38,8 +38,17 @@ export default function OperatorSelect({ onSelect }) {
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
-      <div className="tablet-header">
-        <h1 className="tablet-step-title">1. Wybierz pracownika</h1>
+      <div className="tablet-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1 className="tablet-step-title" style={{ margin: 0 }}>1. Wybierz pracownika</h1>
+        <button
+          type="button"
+          className="btn btn-primary"
+          disabled={selected.length === 0}
+          onClick={() => onSelect(selected)}
+          style={{ height: '50px', fontSize: '1.1rem', fontWeight: '600', whiteSpace: 'nowrap' }}
+        >
+          {`Dalej (${selected.length})`}
+        </button>
       </div>
 
       {selected.length > 0 && (
@@ -166,15 +175,6 @@ export default function OperatorSelect({ onSelect }) {
         )}
       </div>
 
-      <button
-        type="button"
-        className="btn btn-primary w-100 mt-4"
-        disabled={selected.length === 0}
-        onClick={() => onSelect(selected)}
-        style={{ height: '60px', fontSize: '1.3rem', fontWeight: '600' }}
-      >
-        {`Dalej (${selected.length})`}
-      </button>
     </div>
   );
 }
