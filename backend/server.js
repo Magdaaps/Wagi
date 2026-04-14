@@ -794,13 +794,14 @@ app.get('/api/export/sessions', asyncHandler(async (req, res) => {
         });
         aoa.push([]);
       }
-      aoa.push(['POMIARY'], ['Nr', 'Godzina', 'Pusta skrzynka (kg)', 'Pelna skrzynka (kg)', 'Ilosc sztuk', 'Waga produktu (kg)', 'Sr. waga 1 szt (g)', 'Roznica (g)', 'Roznica (%)']);
+      aoa.push(['POMIARY'], ['Nr', 'Nr skrzynki', 'Godzina', 'Pusta skrzynka (kg)', 'Pelna skrzynka (kg)', 'Ilosc sztuk', 'Waga produktu (kg)', 'Sr. waga 1 szt (g)', 'Roznica (g)', 'Roznica (%)']);
       session.measurements.forEach((measurement) => {
         const time = measurement.created_at
           ? new Date(measurement.created_at).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' })
           : '-';
         aoa.push([
           measurement.seq,
+          measurement.box_number || '-',
           time,
           measurement.empty_box_weight_kg,
           measurement.full_box_weight_kg,
